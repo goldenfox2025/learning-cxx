@@ -10,21 +10,29 @@ enum class DataType {
 ///        Rust enum 在实现上就是标签化联合体。
 struct TaggedUnion {
     DataType type;
-    // NOTICE: struct/union 可以相互任意嵌套。
+    // NOTICE: struct/union 可以相互任意嵌套。s
     union {
         float f;
         double d;
     };
 };
 
-// TODO: 将这个函数模板化用于 sigmoid_dyn
-float sigmoid(float x) {
-    return 1 / (1 + std::exp(-x));
+template<typename T>
+T sigmoid_t(T x) {
+    return T(1) / (T(1) + std::exp(-x));
 }
 
 TaggedUnion sigmoid_dyn(TaggedUnion x) {
     TaggedUnion ans{x.type};
-    // TODO: 根据 type 调用 sigmoid
+    // 根据 type 调用 sigmoid_t 模板函数
+    switch (x.type) {
+        case DataType::Float:
+            ans.f = sigmoid_t(x.f);
+            break;
+        case DataType::Double:
+            ans.d = sigmoid_t(x.d);
+            break;
+    }
     return ans;
 }
 
